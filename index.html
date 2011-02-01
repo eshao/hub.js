@@ -5,7 +5,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-	<title>mantoni/hub.js @ GitHub</title>
+	<title>hub.js - JavaScript message multi-caster and object factory with mix-in support</title>
 	
 	<style type="text/css">
 		body {
@@ -21,12 +21,12 @@
 		h1 { font-size: 3.8em; color: #000000; margin-bottom: 3px; }
 		h1 .small { font-size: 0.4em; }
 		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #000000; }
+		h2 { font-size: 1.5em; color: #000000; margin-top: 2em; }
     h3 { text-align: center; color: #000000; }
     a { color: #000000; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
+		pre { background: #555; color: #fff; padding: 15px; border: 1px solid black; }
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
 	</style>
@@ -46,15 +46,11 @@
     </div>
 
     <h1><a href="http://github.com/mantoni/hub.js">hub.js</a>
-      <span class="small">by <a href="http://github.com/mantoni">mantoni</a></span></h1>
+      <span class="small">by <a href="http://github.com/mantoni">Maximilian Antoni</a></span></h1>
 
     <div class="description">
-      hub.js is a message multi-caster and object factory with mixin support
+      hub.js is a JavaScript message multi-caster and object factory with mix-in support.
     </div>
-
-    <h2>Authors</h2>
-<p>Maximilian Antoni<br/>      </p>
-
 
     <h2>Download</h2>
     <p>
@@ -66,6 +62,98 @@
       by running:
       <pre>$ git clone git://github.com/mantoni/hub.js</pre>
     </p>
+
+	<h1>Concept</h1>
+
+	<p>This is a JavaScript implementation of a general programming concept focusing on these three techniques:</p>
+
+	<h2>Message multi-casting</h2>
+
+	<p>The publish / subscribe pattern is used for all component interactions. A user can publish a message on a namespace with some optional data:</p>
+
+	<pre><code>Hub.publish("some.namespace", "my.message", data);
+	</code></pre>
+
+	<p>Namespaces and messages are dot separated identifiers. When publishing a message, the namespace might contain single or double asterisks:</p>
+
+	<pre><code>Hub.publish("some.*.namespace", "my.message", data);
+	Hub.publish("some.**", "my.message", data);
+	</code></pre>
+
+	<p>A single asterisk will match any identifier but stop at a dot while a double asterisk will match any sequence of identifiers across dots.</p>
+
+	<p>Subscriptions work in the same way, although it is also possible to subscribe to messages using wildcards:</p>
+
+	<pre><code>Hub.subscribe("some.namespace", "my.message", function(data) { ... });
+	Hub.subscribe("some.*.namespace", "my.message", function(data) { ... });
+	Hub.subscribe("some.**", "my.message", function(data) { ... });
+	Hub.subscribe("some.namespace", "my.*.message", function(data) { ... });
+	Hub.subscribe("some.namespace", "my.**", function(data) { ... });
+	Hub.subscribe("some.*.namespace", "my.*.message", function(data) { ... });
+	Hub.subscribe("some.**", "my.**", function(data) { ... });
+	Hub.subscribe("**", "**", function(data) { ... });
+	</code></pre>
+
+	<p>If more than one subscription matches a published message, the subscriptions with asterisks are notified first which allows to apply AOP style concepts. In a second step the concrete subscriptions are notified in reverse order of subscribe calls. This allows to apply "overriding" semantics.</p>
+
+	<p>To forward a message to the next subscriber explicitly, Hub.propagate() can be used. A promise is returned to allow further processing after the "super" implementation completes execution (might be asynchronous):</p>
+
+	<pre><code>Hub.subscribe("some.namespace", "my.message", function(data) {
+	    // some logic here
+	    return Hub.propagate().then(function() {
+	        // some more logic here
+	    });
+	});
+	</code></pre>
+
+	<p>Message propagation can also be stopped:</p>
+
+	<pre><code>Hub.subscribe("some.namespace", "my.message", function(data) {
+	    // some logic here
+	    Hub.stopPropagation();
+	});
+	</code></pre>
+
+	<h2>Object factory</h2>
+
+	<p>The hub allows users to install "nodes" which are instances containing groups of message subscribers for one specific namespace. This is an equivalent to the class concept.</p>
+
+	<pre><code>Hub.node("some.node.specific.namespace", function() {
+	    var privateVar = 123;
+
+	    Hub.subscribe("some.other.namespace", "**", function(data) {
+	        // Subscribed to some.other.namespace/**
+	    });
+
+	    return {
+	        "one.message": function(data) {
+	            // Subscribed to some.node.specific.namespace/one.message
+	        },
+	        "another.message": function(data) {
+	            // Subscribed to some.node.specific.namespace/another.message
+	        }
+	    };
+	});
+	</code></pre>
+
+	<p>Each of the key value pairs returned by the nodes factory follow the same semantics as calling the following for each:</p>
+
+	<pre><code>Hub.subscribe("some.node.specific.namespace", key, callback);
+	</code></pre>
+
+	<p>A nodes namespace might also contain asterisks to implement a conceptual equivalent to an aspect in AOP.</p>
+
+	<h2>Mix-ins</h2>
+
+	<p>Nodes might optionaly receive a configuration object as the second argument. One of the supported configuration options is the "is" property. This can be another nodes namespace or an array of namespaces. All listed nodes will be resolved and the provided functions are all merged into this node. If this node subscribes to the same message as a "super" node, they form a chain where this nodes function is invoked first to allow to override the behavior of another node.</p>
+
+	<pre><code>Hub.node("some.node.specific.namespace", {
+	    is: ["some.other.node", "yet.another.node"]
+	}, function() {
+	    return { ... };
+	});
+	</code></pre>
+
 
     <div class="footer">
       get the source code on GitHub : <a href="http://github.com/mantoni/hub.js">mantoni/hub.js</a>
