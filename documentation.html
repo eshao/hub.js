@@ -29,72 +29,24 @@
 		<h3>hub.js</h3>
 		<h2>Separation of concerns with pub/sub multicasting, mixins and promises</h2>
 		<nav>
-			<!-- a href="documentation.html">Documentation</a> | -->
+			<a href="index.html">&lt;&lt; Back</a> |
 			<a href="https://github.com/mantoni/hub.js/raw/master/dist/hub-0.1-SNAPSHOT.js">Download</a> |
 			<a href="https://github.com/mantoni/hub.js">Source code</a>
 		</nav>
 	</header>
 	
 	<section>
-		<h1>Publish &amp; subscribe</h1>
-		<p>
-			The mother of all patterns is one of the core concepts in hub.
-			Typically a <em>topic</em> is used as an identifier. The topics
-			in hub.js have the form <em>namespace/message</em> where
-			<em>namespace</em> and <em>message</em> are both dot-delimited
-			path names.
-		</p>
-		<pre class="sh_javascript">
-Hub.subscribe("say.hello/world", function() { /* ... */ });
-Hub.publish("say.hello/world");</pre>
-		<p>
-			Topics may contain single and double wildcards (* and **) to form
-			<em>aspects</em> in the case of <em>subscribe</em> and
-			<em>broadcasts</em> in the case of <em>publish</em>.
-		</p>
-		<pre class="sh_javascript">
-// Aspect:
-Hub.subscribe("chatroom.**/join", function(buddy) { /* ... */ });
-// Broadcast:
-Hub.publish("chatroom.**/leave", "Buddy");</pre>
+		<h1>Documentation</h1>
+		<ul>
+			<li><a href="#publish">publish</a></li>
+			<li><a href="#subscribe">subscribe</a></li>
+		</ul>
 	</section>
 	
-	<section>
-		<h1>Peers &amp; mixins</h1>
+	<section id="publish">
+		<h1>Publish</h1>
 		<p>
-			Multiple subscriptions for the same <em>namespace</em> can be
-			grouped in modules called <em>peers</em>.
-		</p>
-		<pre class="sh_javascript">
-// Singleton:
-Hub.peer("my.AddressBook", (function() {
-   var persons = [];
-   return {
-      add: function(person) { persons.push(person); },
-      remove: function(person) { /* ... */ }
-   };
-}()));
-
-// Prototype:
-Hub.peer("my.Person", function() {
-   var name;
-   return {
-      setName: function(newName) {
-         name = newName;
-      }
-   };
-});
-
-var person = Hub.get("my.Person"); // creates new Person instance
-person.setName("Max");
-Hub.publish("my.AddressBook/add", person);
-</pre>
-	</section>
-	
-	<section>
-		<h1>Promises</h1>
-		<p>
-			// TODO
+			
 		</p>
 	</section>
 	
