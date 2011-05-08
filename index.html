@@ -21,7 +21,7 @@
 			var s = document.getElementsByTagName('script')[0];
 			s.parentNode.insertBefore(ga, s);
   		})();
-</script>
+	</script>
 </head>
 <body>
 	
@@ -35,67 +35,81 @@
 		</nav>
 	</header>
 	
-	<section>
+	<nav class="select">
+		<a href="#publish-subscribe">Publish &amp; subscribe</a> |
+		<a href="#peers-mixins">Peers &amp; mixins</a> |
+		<a href="#promises">Promises</a>
+	</nav>
+	
+	<section id="publish-subscribe">
 		<h1>Publish &amp; subscribe</h1>
 		<p>
-			The mother of all patterns is one of the core concepts in hub.
-			Typically a <em>topic</em> is used as an identifier. The topics
-			in hub.js have the form <em>namespace/message</em> where
-			<em>namespace</em> and <em>message</em> are both dot-delimited
-			path names.
+			This is the core concept in hub.js. <em>Topics</em> are used as
+			identifiers and have the form <em>namespace/message</em>.
+			The <em>namespace</em> and <em>message</em> parts are both dot
+			delimited path names.
 		</p>
 		<pre class="sh_javascript">
 Hub.subscribe("say.hello/world", function() { /* ... */ });
-Hub.publish("say.hello/world");</pre>
+Hub.publish("say.hello/world");
+</pre>
 		<p>
-			Topics may contain single and double wildcards (* and **) to form
-			<em>aspects</em> in the case of <em>subscribe</em> and
-			<em>broadcasts</em> in the case of <em>publish</em>.
+			Topics may contain single and double wildcards (* and **) which
+			can be used to create <em>aspects</em> and <em>multicasting</em>.
 		</p>
 		<pre class="sh_javascript">
-// Aspect:
 Hub.subscribe("chatroom.**/join", function(buddy) { /* ... */ });
-// Broadcast:
 Hub.publish("chatroom.**/leave", "Buddy");</pre>
+		<a class="next" href="#peers-mixins">Peers &amp; mixins &gt;&gt;</a>
 	</section>
 	
-	<section>
+	<section id="peers-mixins">
 		<h1>Peers &amp; mixins</h1>
 		<p>
 			Multiple subscriptions for the same <em>namespace</em> can be
-			grouped in modules called <em>peers</em>.
+			grouped in <em>peers</em> that share information.
 		</p>
 		<pre class="sh_javascript">
-// Singleton:
-Hub.peer("my.AddressBook", (function() {
-   var persons = [];
+Hub.peer("my.AddressBook", function() {
+   var people = [];
    return {
-      add: function(person) { persons.push(person); },
-      remove: function(person) { /* ... */ }
-   };
-}()));
-
-// Prototype:
-Hub.peer("my.Person", function() {
-   var name;
-   return {
-      setName: function(newName) {
-         name = newName;
-      }
+      add: function(person) { /* ... */ }
    };
 });
-
-var person = Hub.get("my.Person"); // creates new Person instance
-person.setName("Max");
-Hub.publish("my.AddressBook/add", person);
 </pre>
+		<p>
+			Peers can also be mixed:
+		</p>
+		<pre class="sh_javascript">
+Hub.peer("my.AddressBook", ["Persistable", "Searchable"], function() {
+   /* ... */
+});
+</pre>
+		<a class="previous"
+			href="#publish-subscribe">&lt;&lt; Publish &amp; subscribe</a>
+		<a class="next" href="#promises">Promises &gt;&gt;</a>
 	</section>
 	
-	<section>
+	<section id="promises">
 		<h1>Promises</h1>
 		<p>
-			// TODO
+			With hub.js it does not matter whether things happen synchronous
+			or asynchronous. Result processing always works in the same way.
 		</p>
+		<pre class="sh_javascript">
+Hub.publish("some/topic").then(function(result) { /* ... */ });
+</pre>
+		<p>
+			Parallel execution is easy to manage.
+		</p>
+		<pre class="sh_javascript">
+var first = Hub.publish("first/thing");
+var second = Hub.publish("second/thing");
+first.join(second).then(function(firstResult, secondResult) { /* ... */ });
+</pre>
+		<a class="previous"
+			href="#peers-mixins">&lt;&lt; Peers &amp; mixins</a>
+		<!-- a class="next" href="documentation.html">Documentation &gt;&gt;</a -->
 	</section>
 	
 	<footer>
@@ -104,6 +118,26 @@ Hub.publish("my.AddressBook/add", person);
 		<a href="http://twitter.com/mantoni">Twitter</a>
 	</footer>
 	
+	<script type="text/javascript">
+		var sections = document.getElementsByTagName("section");
+		var links = document.getElementsByTagName("a");
+		for(var i = 0; i < links.length; i++) {
+			if(links[i].getAttribute("href").substring(0, 1) === "#") {
+				links[i].onclick = select;
+			}
+		}
+		function change(id) {
+			for(var i = 0; i < sections.length; i++) {
+				var display = sections[i].id === id ? "block" : "none";
+				sections[i].style.display = display;
+			}
+		}
+		function select() {
+			change(this.getAttribute("href").substring(1));
+			return false;
+		}
+		change("publish-subscribe");
+	</script>
 	<script type="text/javascript" src="sh_javascript.min.js"></script>
 </body>
 </html>
