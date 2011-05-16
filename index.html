@@ -123,7 +123,7 @@ first.join(second).then(function(firstResult, secondResult) { /* ... */ });
 		var sections = document.getElementsByTagName("section");
 		var links = document.getElementsByTagName("a");
 		for(var i = 0; i < links.length; i++) {
-			if(links[i].getAttribute("href").substring(0, 1) === "#") {
+			if(links[i].getAttribute("href").indexOf("#") !== -1) {
 				links[i].onclick = select;
 			}
 		}
@@ -134,7 +134,8 @@ first.join(second).then(function(firstResult, secondResult) { /* ... */ });
 			}
 		}
 		function select() {
-			change(this.getAttribute("href").substring(1));
+			var href = this.getAttribute("href");
+			change(href.substring(href.indexOf("#") + 1));
 			return false;
 		}
 		change("publish-subscribe");
