@@ -51,16 +51,16 @@
 			delimited path names.
 		</p>
 		<pre class="sh_javascript">
-Hub.subscribe("say.hello/world", function() { /* ... */ });
-Hub.publish("say.hello/world");
+hub.subscribe("say.hello/world", function() { /* ... */ });
+hub.publish("say.hello/world");
 </pre>
 		<p>
 			Topics may contain single and double wildcards (* and **) which
 			can be used to create <em>aspects</em> and <em>multicasting</em>.
 		</p>
 		<pre class="sh_javascript">
-Hub.subscribe("chatroom.**/join", function(buddy) { /* ... */ });
-Hub.publish("chatroom.**/leave", "Buddy");</pre>
+hub.subscribe("chatroom.**/join", function(buddy) { /* ... */ });
+hub.publish("chatroom.**/leave", "Buddy");</pre>
 		<a class="next" href="#peers-mixins">Peers &amp; mixins &gt;&gt;</a>
 	</section>
 	
@@ -71,7 +71,7 @@ Hub.publish("chatroom.**/leave", "Buddy");</pre>
 			grouped in <em>peers</em> that share information.
 		</p>
 		<pre class="sh_javascript">
-Hub.peer("my.AddressBook", function() {
+hub.peer("my.AddressBook", function() {
    var people = [];
    return {
       add: function(person) { /* ... */ }
@@ -82,7 +82,7 @@ Hub.peer("my.AddressBook", function() {
 			Peers can also be mixed:
 		</p>
 		<pre class="sh_javascript">
-Hub.peer("my.AddressBook", ["Persistable", "Searchable"], function() {
+hub.peer("my.AddressBook", ["Persistable", "Searchable"], function() {
    /* ... */
 });
 </pre>
@@ -98,14 +98,14 @@ Hub.peer("my.AddressBook", ["Persistable", "Searchable"], function() {
 			or asynchronous. Result processing always works in the same way.
 		</p>
 		<pre class="sh_javascript">
-Hub.publish("some/topic").then(function(result) { /* ... */ });
+hub.publish("some/topic").then(function(result) { /* ... */ });
 </pre>
 		<p>
 			Parallel execution is easy to manage.
 		</p>
 		<pre class="sh_javascript">
-var first = Hub.publish("first/thing");
-var second = Hub.publish("second/thing");
+var first = hub.publish("first/thing");
+var second = hub.publish("second/thing");
 first.join(second).then(function(firstResult, secondResult) { /* ... */ });
 </pre>
 		<a class="previous"
@@ -124,7 +124,7 @@ first.join(second).then(function(firstResult, secondResult) { /* ... */ });
 		var sections = document.getElementsByTagName("section");
 		var links = document.getElementsByTagName("a");
 		for(var i = 0; i < links.length; i++) {
-			if(links[i].getAttribute("href").substring(0, 1) === "#") {
+			if(links[i].getAttribute("href").indexOf("#") !== -1) {
 				links[i].onclick = select;
 			}
 		}
@@ -135,7 +135,8 @@ first.join(second).then(function(firstResult, secondResult) { /* ... */ });
 			}
 		}
 		function select() {
-			change(this.getAttribute("href").substring(1));
+			var href = this.getAttribute("href");
+			change(href.substring(href.indexOf("#") + 1));
 			return false;
 		}
 		change("publish-subscribe");
