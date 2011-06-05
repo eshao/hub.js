@@ -30,7 +30,7 @@
 		<h2>Separation of concerns with pub/sub multicasting, mixins and promises</h2>
 		<nav>
 			<!-- a href="documentation.html">Documentation</a> | -->
-			<a href="https://github.com/mantoni/hub.js/raw/master/dist/hub-0.1-SNAPSHOT.js">Download v0.1.0</a> |
+			<a href="https://github.com/mantoni/hub.js/raw/master/dist/hub-0.1-SNAPSHOT.js">Download v0.1-SNAPSHOT</a> |
 			<a href="https://github.com/mantoni/hub.js">Source code</a> |
 			<a href="http://groups.google.com/group/hub-js">Google group</a>
 		</nav>
@@ -45,29 +45,28 @@
 	<section id="publish-subscribe">
 		<h1>Publish &amp; subscribe</h1>
 		<p>
-			This is the core concept in hub.js. <em>Topics</em> are used as
-			identifiers and have the form <em>namespace/message</em>.
-			The <em>namespace</em> and <em>message</em> parts are both dot
-			delimited path names.
+			Pub/sub is the core concept in hub.js. <em>Topics</em>
+			identify callback functions to register or invoke on the hub.
+			Topics simple dot delimited path names.
 		</p>
 		<pre class="sh_javascript">
-hub.subscribe("say.hello/world", function() { /* ... */ });
-hub.publish("say.hello/world");
+hub.subscribe("say.hello.world", function() { /* ... */ });
+hub.publish("say.hello.world");
 </pre>
 		<p>
-			Topics may contain single and double wildcards (* and **) which
-			can be used to create <em>aspects</em> and <em>multicasting</em>.
+			Topics may contain wildcards (*) which can be used to create
+			<em>aspects</em> or to <em>multicast</em> messages.
 		</p>
 		<pre class="sh_javascript">
-hub.subscribe("chatroom.**/join", function(buddy) { /* ... */ });
-hub.publish("chatroom.**/leave", "Buddy");</pre>
+hub.subscribe("chatroom.*.join", function(buddy) { /* ... */ });
+hub.publish("chatroom.*.leave", "Buddy");</pre>
 		<a class="next" href="#peers-mixins">Peers &amp; mixins &gt;&gt;</a>
 	</section>
 	
 	<section id="peers-mixins">
 		<h1>Peers &amp; mixins</h1>
 		<p>
-			Multiple subscriptions for the same <em>namespace</em> can be
+			Multiple subscriptions for the same <em>topic</em> can be
 			grouped in <em>peers</em> that share information.
 		</p>
 		<pre class="sh_javascript">
@@ -82,8 +81,13 @@ hub.peer("my.AddressBook", function() {
 			Peers can also be mixed:
 		</p>
 		<pre class="sh_javascript">
-hub.peer("my.AddressBook", ["Persistable", "Searchable"], function() {
-   /* ... */
+hub.peer("my.AddressBook", function() {
+   this.mix("Persistable");
+   this.mix("Searchable");
+
+   return {
+      /* ... */	
+   };
 });
 </pre>
 		<a class="previous"
@@ -95,17 +99,17 @@ hub.peer("my.AddressBook", ["Persistable", "Searchable"], function() {
 		<h1>Promises</h1>
 		<p>
 			With hub.js it does not matter whether things happen synchronous
-			or asynchronous. Result processing always works in the same way.
+			or asynchronous. Results are always processed in the same way.
 		</p>
 		<pre class="sh_javascript">
-hub.publish("some/topic").then(function(result) { /* ... */ });
+hub.publish("some.topic").then(function(result) { /* ... */ });
 </pre>
 		<p>
 			Parallel execution is easy to manage.
 		</p>
 		<pre class="sh_javascript">
-var first = hub.publish("first/thing");
-var second = hub.publish("second/thing");
+var first = hub.publish("first.thing");
+var second = hub.publish("second.thing");
 first.join(second).then(function(firstResult, secondResult) { /* ... */ });
 </pre>
 		<a class="previous"
