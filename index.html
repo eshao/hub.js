@@ -50,16 +50,16 @@
 			Topics simple dot delimited path names.
 		</p>
 		<pre class="sh_javascript">
-hub.subscribe("say.hello.world", function() { /* ... */ });
-hub.publish("say.hello.world");
+hub.on("say.hello.world", function() { /* ... */ });
+hub.emit("say.hello.world");
 </pre>
 		<p>
 			Topics may contain wildcards (*) which can be used to create
 			<em>aspects</em> or to <em>multicast</em> messages.
 		</p>
 		<pre class="sh_javascript">
-hub.subscribe("chatroom.*.join", function(buddy) { /* ... */ });
-hub.publish("chatroom.*.leave", "Buddy");</pre>
+hub.on("chatroom.*.join", function(buddy) { /* ... */ });
+hub.emit("chatroom.*.leave", "Buddy");</pre>
 		<a class="next" href="#peers-mixins">Peers &amp; mixins &gt;&gt;</a>
 	</section>
 	
@@ -102,14 +102,14 @@ hub.peer("my.AddressBook", function() {
 			or asynchronous. Results are always processed in the same way.
 		</p>
 		<pre class="sh_javascript">
-hub.publish("some.topic").then(function(result) { /* ... */ });
+hub.emit("some.topic").then(function(result) { /* ... */ });
 </pre>
 		<p>
 			Parallel execution is easy to manage.
 		</p>
 		<pre class="sh_javascript">
-var first = hub.publish("first.thing");
-var second = hub.publish("second.thing");
+var first = hub.emit("first.thing");
+var second = hub.emit("second.thing");
 first.join(second).then(function(firstResult, secondResult) { /* ... */ });
 </pre>
 		<a class="previous"
