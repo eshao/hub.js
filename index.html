@@ -1,155 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<meta name="description" content="separation of concerns with pub/sub multicasting, mixins and promises" />
-	<title>hub.js - separation of concerns with pub/sub multicasting, mixins and promises</title>
-	<link rel="stylesheet" type="text/css" href="styles.css" />
-	<link rel="stylesheet" type="text/css" href="sh_nedit.min.css" />
-	<!--[if IE]>
-	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-126897-7']);
-		_gaq.push(['_trackPageview']);
-		(function() {
-			var ga = document.createElement('script');
-			ga.type = 'text/javascript';
-			ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0];
-			s.parentNode.insertBefore(ga, s);
-  		})();
-	</script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="description" content="event oriented javascript" />
+  <title>Event oriented JavaScript - hub.js</title>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <link rel="stylesheet" type="text/css" href="sh_nedit.min.css" />
+  <!--[if IE]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-126897-7']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' :
+        'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
 </head>
 <body>
-	
-	<header>
-		<h3>hub.js</h3>
-		<h2>Separation of concerns with pub/sub multicasting, mixins and promises</h2>
-		<h4>
-			Download v0.1.2 <a href="pkg/hub-0.1.2.js">source</a> or
-			<a href="pkg/hub-0.1.2.min.js">minified</a>
-		</h4>
-		<nav>
-			<strong>Features</strong> |
-			<!-- a href="documentation.html">Documentation</a> | -->
-			<a href="examples.html">Examples</a> |
-			<a href="https://github.com/mantoni/hub.js">Sources on GitHub</a> |
-			<a href="http://groups.google.com/group/hub-js">Google group</a>
-		</nav>
-	</header>
-	
-	<nav class="select">
-		<a href="#publish-subscribe">Publish &amp; subscribe</a> |
-		<a href="#peers-mixins">Peers &amp; mixins</a> |
-		<a href="#promises">Promises</a>
-	</nav>
-	
-	<section id="publish-subscribe">
-		<h1>Publish &amp; subscribe</h1>
-		<p>
-			Pub/sub is the core concept in hub.js. <em>Topics</em>
-			identify callback functions to register or invoke on the hub.
-			Topics simple dot delimited path names.
-		</p>
-		<pre class="sh_javascript">
-hub.on("say.hello.world", function() { /* ... */ });
-hub.emit("say.hello.world");
-</pre>
-		<p>
-			Topics may contain wildcards (*) which can be used to create
-			<em>aspects</em> or to <em>multicast</em> messages.
-		</p>
-		<pre class="sh_javascript">
-hub.on("chatroom.*.join", function(buddy) { /* ... */ });
-hub.emit("chatroom.*.leave", "Buddy");</pre>
-		<a class="next" href="#peers-mixins">Peers &amp; mixins &gt;&gt;</a>
-	</section>
-	
-	<section id="peers-mixins">
-		<h1>Peers &amp; mixins</h1>
-		<p>
-			Multiple subscriptions for the same <em>topic</em> can be
-			grouped in <em>peers</em> that share information.
-		</p>
-		<pre class="sh_javascript">
-hub.peer("my.AddressBook", function() {
-   var people = [];
-   return {
-      add: function(person) { /* ... */ }
-   };
-});
-</pre>
-		<p>
-			Peers can also be mixed:
-		</p>
-		<pre class="sh_javascript">
-hub.peer("my.AddressBook", function() {
-   this.mix("Persistable");
-   this.mix("Searchable");
+  <a href="https://github.com/mantoni/hub.js/"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/5d21241b64dc708fcbb701f68f72f41e9f1fadd6/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
 
-   return {
-      /* ... */	
-   };
+  <header>
+    <h3>hub.js</h3>
+    <h2>Event oriented JavaScript</h2>
+    <!--
+    <h4>
+      Download v0.1.2 <a href="pkg/hub-0.1.2.js">source</a> or
+      <a href="pkg/hub-0.1.2.min.js">minified</a>
+    </h4>
+    -->
+  </header>
+
+  <section>
+    <h1>Why this project</h1>
+    <p>
+      This is an experiment to find out whether entire programs can be written
+      using pub/sub and what is required to make that possible. It should
+      allow implementations to change from synchronous to asynchronous 
+      without the need to change one of the callers. It should also allow to
+      intercept or hook into exising behavior.
+    </p>
+    <p>
+      The first implementation was getting too complicated
+      and I've leared a lot on the way. Therefore I'm starting again from
+      scratch which means this is all quite early, buggy and incomplete.
+      Feel free to join or provide feedback. If you think all this is an
+      utterly stupid idea, talk to the hand.
+    </p>
+    
+    <h1>Publish &amp; subscribe</h1>
+    <p>
+      Pub/sub is the core concept in hub.js. Event names are dot separated
+      identifiers.
+    </p>
+    <pre class="sh_javascript">
+hub.on('hello.world', function () { /* ... */ });
+hub.emit('hello.world');
+</pre>
+    <p>
+      Listeners can take arguments and either return a value or expect a
+      callback as the last argument that receives the return value. The
+      following two listeners behave identically:
+    </p>
+    <pre class="sh_javascript">
+hub.on('greet', function (who) {
+  return 'Hello ' + who;
+});
+hub.on('greet', function (who, callback) {
+  callback(null, 'Hello ' + who);
 });
 </pre>
-		<a class="previous"
-			href="#publish-subscribe">&lt;&lt; Publish &amp; subscribe</a>
-		<a class="next" href="#promises">Promises &gt;&gt;</a>
-	</section>
-	
-	<section id="promises">
-		<h1>Promises</h1>
-		<p>
-			With hub.js it does not matter whether things happen synchronous
-			or asynchronous. Results are always processed in the same way.
-		</p>
-		<pre class="sh_javascript">
-hub.emit("some.topic").then(function(result) { /* ... */ });
+    <p>
+      Although there are two ways to return values, they can only be received
+      via a callback. This allows listener implementations to change from
+      synchronous to asynchronous without changing any of the "callers".
+    </p>
+    <pre class="sh_javascript">
+hub.emit('greet', 'Hub', function (err, greeting) { /* ... */ });
 </pre>
-		<p>
-			Parallel execution is easy to manage.
-		</p>
-		<pre class="sh_javascript">
-var first = hub.emit("first.thing");
-var second = hub.emit("second.thing");
-first.join(second).then(function(firstResult, secondResult) { /* ... */ });
+    <p>
+      If multiple listeners are registered for the same event, a decision has
+      to be made about how to deal with multiple return values. By default,
+      the last non-undefined value is returned. There are a number of
+      different strategies available, e.g. MERGE, CONCAT, MIN, MAX ...
+      It is also possible to provide custom strategies. The strategy has to be
+      the last argument before the callback.
+    </p>
+    <pre class="sh_javascript">
+hub.emit('greet', 'Hub', hub.CONCAT, function (err, greeting) { /* ... */ });
 </pre>
-		<a class="previous"
-			href="#peers-mixins">&lt;&lt; Peers &amp; mixins</a>
-		<!-- a class="next" href="documentation.html">Documentation &gt;&gt;</a -->
-	</section>
-	
-	<footer>
-		Copyright 2011, <a href="http://maxantoni.de">Maximilian Antoni</a> |
-		<a href="https://github.com/mantoni">GitHub profile</a> |
-		<a href="http://twitter.com/mantoni">Twitter</a> |
-		<a href="http://semver.org/">Semantic versioning</a>
-	</footer>
-	
-	<script type="text/javascript">
-		var sections = document.getElementsByTagName("section");
-		var links = document.getElementsByTagName("a");
-		for(var i = 0; i < links.length; i++) {
-			if(links[i].getAttribute("href").indexOf("#") !== -1) {
-				links[i].onclick = select;
-			}
-		}
-		function change(id) {
-			for(var i = 0; i < sections.length; i++) {
-				var display = sections[i].id === id ? "block" : "none";
-				sections[i].style.display = display;
-			}
-		}
-		function select() {
-			var href = this.getAttribute("href");
-			change(href.substring(href.indexOf("#") + 1));
-			return false;
-		}
-		change("publish-subscribe");
-	</script>
-	<script type="text/javascript" src="sh_javascript.min.js"></script>
+  </section>
+
+  <footer>
+    Copyright 2012, <a href="http://maxantoni.de">Maximilian Antoni</a> |
+    <a href="https://github.com/mantoni">GitHub profile</a> |
+    <a href="http://twitter.com/mantoni">Twitter</a> |
+    <a href="http://semver.org/">Semantic versioning</a>
+  </footer>
+  <script type="text/javascript" src="sh_javascript.min.js"></script>
 </body>
 </html>
