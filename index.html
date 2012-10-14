@@ -31,28 +31,29 @@
         <hr>
 
         <section id="main_content">
-          <h1>hub.js</h1>
+          <h1>Advanced events for your modules</h1>
 
-<p>Pub/Sub oriented JavaScript - <a href="http://mantoni.github.com/hub.js">http://mantoni.github.com/hub.js</a></p>
+<p>Let your JavaScript modules talk to each other with asynchronous publish / subscribe.
+On Node.js or in the browser.</p>
 
-<p><a href="http://travis-ci.org/mantoni/hub.js"><img src="https://secure.travis-ci.org/mantoni/hub.js.png?branch=rewrite" alt="Build Status"></a></p>
+<h2>Get it!</h2>
 
-<h2>Install</h2>
+<p>Install on Node with NPM:</p>
 
 <pre><code>npm install hubjs
 </code></pre>
 
-<p>You can also download a browser package from <a href="https://github.com/mantoni/hub.js/downloads">https://github.com/mantoni/hub.js/downloads</a> or <code>make compile</code> it yourself.</p>
+<p>Or download a <a href="https://github.com/mantoni/hub.js/downloads">package for browsers</a>.</p>
 
-<h2>Usage</h2>
+<hr><h1>Usage</h1>
 
-<h3>Instantiation</h3>
+<h2>Instantiation</h2>
 
 <div class="highlight"><pre><span class="kd">var</span> <span class="nx">hubjs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'hubjs'</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">hub</span> <span class="o">=</span> <span class="nx">hubjs</span><span class="p">();</span>
 </pre></div>
 
-<h3>Publish / Subscribe</h3>
+<h2>Publish / Subscribe</h2>
 
 <div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'some.event'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// ...</span>
@@ -60,7 +61,7 @@
 <span class="nx">hub</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'some.event'</span><span class="p">,</span> <span class="s1">'any'</span><span class="p">,</span> <span class="s1">'args'</span><span class="p">);</span>
 </pre></div>
 
-<h3>Return Values</h3>
+<h2>Return Values</h2>
 
 <div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'answer'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="mi">42</span><span class="p">;</span>
@@ -70,7 +71,7 @@
 <span class="p">});</span>
 </pre></div>
 
-<h3>Callbacks</h3>
+<h2>Callbacks</h2>
 
 <p>Simply define an (additional) callback argument:</p>
 
@@ -84,7 +85,7 @@
 
 <p>Alternatively, call <code>this.callback()</code> to obtain a callback, or even multiple callbacks that will be waited for.</p>
 
-<h3>Exception Handling</h3>
+<h2>Exception Handling</h2>
 
 <div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'answer'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'ouch!'</span><span class="p">);</span>
@@ -96,31 +97,26 @@
 
 <p>Exceptions from multiple listeners will be merged into an <code>ErrorList</code> with an <code>errors</code> array containing all the original exceptions.</p>
 
-<h3>Wildcard Subscriptions</h3>
+<h2>Wildcard Subscriptions</h2>
+
+<p>It is also possible to subscribe to events matching an expression.</p>
 
 <p><code>*</code> matches <code>test</code>, but not <code>test.two</code>, while <code>**</code> matches both. <code>test.*</code> matches <code>test.one</code> but not <code>one.test</code>.
-Unless normal listeners, matchers do not get invoked in registration order. The more generic matchers get invoked before the more specific ones, e.g. <code>a.**</code> is invoked before <code>a.b.*</code> if <code>a.b.c</code> is emitted.</p>
+Unless normal listeners, matchers do not get invoked in registration order. The more generic matchers are invoked before the more specific ones, e.g. if <code>a.b.c</code> is emitted, a listener on <code>a.**</code> is invoked before a listener on <code>a.b.*</code>.</p>
 
-<div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'**'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'hub event '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">event</span> <span class="o">+</span> <span class="s1">'('</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">args</span><span class="p">().</span><span class="nx">join</span><span class="p">(</span><span class="s1">', '</span><span class="p">)</span> <span class="o">+</span> <span class="s1">')'</span><span class="p">);</span>
-<span class="p">});</span>
-
-<span class="nx">hub</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="s1">'server.*'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">'No data passed to '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">event</span> <span class="o">+</span> <span class="s1">'. Aborting.'</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-  <span class="p">}</span>
+<div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'**.init'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
 <span class="p">});</span>
 </pre></div>
 
-<h3>Wildcard Emit</h3>
+<h2>Wildcard Emit / Broadcasting</h2>
 
-<div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'module.**.start'</span><span class="p">);</span>
+<p>It is also possible to use wildcards with <code>hub.emit</code> to invoke all matching listeners.</p>
 
-<span class="nx">hub</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'**.destroy'</span><span class="p">);</span>
+<div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'**.destroy'</span><span class="p">);</span>
 </pre></div>
 
-<h3>Event Phases</h3>
+<h2>Event Phases</h2>
 
 <p>Each event is emitted in 6 phases:</p>
 
@@ -134,9 +130,9 @@ Unless normal listeners, matchers do not get invoked in registration order. The 
 </ol><p>Each phase is completed if all callbacks on all listeners where invoked. The next phase in only executed if the previous one is complete.
 Calling <code>this.stop()</code> will prevent the following phases from being executed. Note that other listeners on the same phase will still be invoked.</p>
 
-<p>The first 4 phases will receive the arguments passed to emit. Phase 5 and 6 will receive <code>(err, value)</code>, which is the same as what gets passed to an  <code>emit</code> callback.</p>
+<p>The first 4 phases will receive the arguments passed to emit. Phase 5 and 6 will receive <code>(err, value)</code>, which is the same as what gets passed to an <code>emit</code> callback.</p>
 
-<h3>Strategies</h3>
+<h2>Strategies</h2>
 
 <p>Strategies are functions that take an array of non-undefined values and return a result of any type.</p>
 
@@ -156,90 +152,99 @@ Calling <code>this.stop()</code> will prevent the following phases from being ex
 <code>LAST</code> - returns the last non-undefined value</li>
 <li>
 <code>CONCAT</code> - returns an array of all non-undefined listener return values</li>
-</ul><h2>API</h2>
+</ul><hr><h1>API</h1>
 
-<h5><code>hub([listeners])</code></h5>
+<h4><code>hubjs([listeners])</code></h4>
 
 <p>The hub module exports a factory function which takes optional listeners and returns a hub instance. All functions in the given listeners object will be installed on the hub instance using <code>on</code>.</p>
 
-<h5><code>hub.on(event, function)</code></h5>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">hubjs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'hubjs'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">hub</span> <span class="o">=</span> <span class="nx">hubjs</span><span class="p">({</span>
+  <span class="s1">'some.event'</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h4><code>hub.on(event, function)</code></h4>
 
 <p>Registers a listener for an event. The event may contain <code>*</code> or <code>**</code> to register a "matcher" (see below). If the listener function expects more arguments than are passed to <code>emit</code>, the last argument will be a callback function. The listener is expected to invoke the callback once completed with an error object or <code>null</code> and a single return value.</p>
 
-<h5><code>hub.before(event, function)</code></h5>
+<div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'**'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'hub event '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">event</span> <span class="o">+</span> <span class="s1">'('</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">args</span><span class="p">().</span><span class="nx">join</span><span class="p">(</span><span class="s1">', '</span><span class="p">)</span> <span class="o">+</span> <span class="s1">')'</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<h4><code>hub.addListener(event, function)</code></h4>
+
+<p>Is an alias for <code>hub.on</code>.</p>
+
+<h4><code>hub.before(event, function)</code></h4>
 
 <p>Like on, but invoked before listeners registered with <code>on</code>.</p>
 
-<h5><code>hub.after(event, function)</code></h5>
+<h4><code>hub.after(event, function)</code></h4>
 
-<p>Like on, but invoked after listeners registered with <code>on</code> and gets invoked with the arguments <code>(err, value)</code>.</p>
+<p>Like on, but invoked after listeners registered with <code>on</code>. The arguments passed to the given function are the same as passed to a callback to <code>emit</code>.</p>
 
-<h5><code>hub.un(event)</code></h5>
+<div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="s1">'some.server.request'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="p">});</span>
 
-<p>Unregisters all listeners for the given event.</p>
+<span class="nx">hub</span><span class="p">.</span><span class="nx">after</span><span class="p">(</span><span class="s1">'some.server.request'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="p">});</span>
+</pre></div>
 
-<h5><code>hub.un(event, function)</code></h5>
+<h4><code>hub.un(event, function)</code></h4>
 
 <p>Unregisters a single listener for an event.</p>
 
-<h5><code>hub.once(event, function)</code></h5>
+<h4><code>hub.removeListener(event, function)</code></h4>
+
+<p>Is an alias for <code>hub.un</code>.</p>
+
+<h4><code>hub.removeAllListeners([event])</code></h4>
+
+<p>Unregisters all listeners, or all listeners for the given event.</p>
+
+<h4><code>hub.once(event, function)</code></h4>
 
 <p>Registers a listerner for an event that will be automatically unregistered on the first invocation.</p>
 
-<h5><code>hub.emit(event[, arg1, arg2, ...][[, strategy], callback])</code></h5>
+<h4><code>hub.emit(event[, arg1, arg2, ...][[, strategy], callback])</code></h4>
 
 <p>Invokes all listeners for an event. The optional arguments are passed to each listener. The event may contain <code>*</code> or <code>**</code> to invoke all listeners registered for matching events (broadcasting). The optional callback will be invoked once all listeners returned. The first argument is an error if at least one of the listeners threw, the second argument is the return value. If a callback is given, the optional strategy filters the return values of the listeners. By default the strategy <code>hub.LAST</code> is used.</p>
 
-<h3>this in listeners</h3>
+<h2>this in listeners</h2>
 
 <p>The API of the <code>this</code> object in all listeners and callbacks:</p>
 
-<h5><code>hub</code></h5>
+<h4><code>hub</code></h4>
 
 <p>The hub instance.</p>
 
-<h5><code>event</code></h5>
+<h4><code>event</code></h4>
 
 <p>The current event.</p>
 
-<h5><code>args()</code></h5>
+<h4><code>args()</code></h4>
 
 <p>Returns a copy of the arguments passed to emit following the event.</p>
 
-<h5><code>stop()</code></h5>
+<h4><code>stop()</code></h4>
 
 <p>Prevent listener invocation on the following event phases.</p>
 
-<h5><code>stopped()</code></h5>
+<h4><code>stopped()</code></h4>
 
 <p>Returns true if <code>stop()</code> was called.</p>
 
-<h5><code>callback()</code></h5>
+<h4><code>callback()</code></h4>
 
 <p>Returns a callback that has to be invoked for the operation to complete. Listeners may obtain mutliple callbacks.</p>
 
-<h3>events</h3>
+<h2>events</h2>
 
 <p>Calling <code>on</code>, <code>before</code>, <code>after</code> or <code>once</code> triggers a <code>newListener</code> event passing the event name and the listener function as arguments. If the event gets stopped (<code>this.stop()</code>) the listener will not be registered.</p>
-
-<h2>Run tests</h2>
-
-<pre><code>make
-</code></pre>
-
-<h2>Run tests in your browser</h2>
-
-<p>This requires <a href="https://github.com/mantoni/nomo.js">nomo.js</a>.</p>
-
-<pre><code>nomo server
-</code></pre>
-
-<p>Open http://localhost:4444/test in your browser.</p>
-
-<h2>Compile for browsers and minify</h2>
-
-<pre><code>make compile
-</code></pre>
         </section>
 
         <footer>
