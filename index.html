@@ -152,7 +152,24 @@ Calling <code>this.stop()</code> will prevent the following phases from being ex
 <code>LAST</code> - returns the last non-undefined value</li>
 <li>
 <code>CONCAT</code> - returns an array of all non-undefined listener return values</li>
-</ul><hr><h1>API</h1>
+</ul><h2>Views</h2>
+
+<p>Views expose the hub API but map all event names relative to the given namespace.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">hub</span><span class="p">.</span><span class="nx">view</span><span class="p">(</span><span class="s1">'server'</span><span class="p">);</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'listen'</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span> <span class="c1">// emits server.listen</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'request'</span><span class="p">,</span> <span class="p">...);</span> <span class="c1">// registers a listener on server.request</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">removeAllListeners</span><span class="p">();</span> <span class="c1">// removes all listeners matching server.**</span>
+</pre></div>
+
+<p>The <code>this</code> keyword references a view in each listener that is relative to the namespace of the current event.</p>
+
+<div class="highlight"><pre><span class="nx">hub</span><span class="p">.</span><span class="nx">once</span><span class="p">(</span><span class="s1">'server.listen'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'request'</span><span class="p">,</span> <span class="p">...);</span> <span class="c1">// register a listener for server.request</span>
+<span class="p">});</span>
+</pre></div>
+
+<hr><h1>API</h1>
 
 <h4><code>hubjs([listeners])</code></h4>
 
@@ -210,13 +227,21 @@ Calling <code>this.stop()</code> will prevent the following phases from being ex
 
 <p>Registers a listerner for an event that will be automatically unregistered on the first invocation.</p>
 
+<h4><code>hub.onceBefore(event, function)</code></h4>
+
+<p>Like <code>once</code>, but registers the listener with <code>hub.before</code>.</p>
+
+<h4><code>hub.onceAfter(event, function)</code></h4>
+
+<p>Like <code>once</code>, but registers the listener with <code>hub.after</code>.</p>
+
 <h4><code>hub.emit(event[, arg1, arg2, ...][[, strategy], callback])</code></h4>
 
 <p>Invokes all listeners for an event. The optional arguments are passed to each listener. The event may contain <code>*</code> or <code>**</code> to invoke all listeners registered for matching events (broadcasting). The optional callback will be invoked once all listeners returned. The first argument is an error if at least one of the listeners threw, the second argument is the return value. If a callback is given, the optional strategy filters the return values of the listeners. By default the strategy <code>hub.LAST</code> is used.</p>
 
 <h2>this in listeners</h2>
 
-<p>The API of the <code>this</code> object in all listeners and callbacks:</p>
+<p>The API of the <code>this</code> object in all listeners and callbacks exposes the hub API (see Views), plus some additional functions and properties:</p>
 
 <h4><code>hub</code></h4>
 
@@ -228,7 +253,7 @@ Calling <code>this.stop()</code> will prevent the following phases from being ex
 
 <h4><code>args()</code></h4>
 
-<p>Returns a copy of the arguments passed to emit following the event.</p>
+<p>Returns a copy of the arguments passed to emit without the event.</p>
 
 <h4><code>stop()</code></h4>
 
@@ -240,11 +265,11 @@ Calling <code>this.stop()</code> will prevent the following phases from being ex
 
 <h4><code>callback()</code></h4>
 
-<p>Returns a callback that has to be invoked for the operation to complete. Listeners may obtain mutliple callbacks.</p>
+<p>Returns a callback that has to be invoked for the operation to complete. Listeners may obtain mutliple callbacks. The next even phase will be entered once all callbacks where invoked.</p>
 
 <h2>events</h2>
 
-<p>Calling <code>on</code>, <code>before</code>, <code>after</code> or <code>once</code> triggers a <code>newListener</code> event passing the event name and the listener function as arguments. If the event gets stopped (<code>this.stop()</code>) the listener will not be registered.</p>
+<p>Calling <code>on</code>, <code>before</code>, <code>after</code>, <code>once</code>, <code>onceBefore</code> or <code>onceAfter</code> triggers a <code>newListener</code> event passing the event name and the listener function as arguments. If the event gets stopped (<code>this.stop()</code>) the listener will not be registered.</p>
         </section>
 
         <footer>
